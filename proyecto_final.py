@@ -51,10 +51,6 @@ def buscar_producto(nombre):
     return False
 
 def registrar_producto(nombre, precio, cantidad_disponible):
-  if buscar_producto(nombre):
-    print("Dicho producto, ya existe")
-    raise ValueError()
-
   precio = float(precio)
   cantidad_disponible = int(cantidad_disponible)
 
@@ -65,7 +61,11 @@ def registrar_producto(nombre, precio, cantidad_disponible):
     print('la cantidad disponible no puede ser negativa')
     raise ValueError
 
-  productos[nombre.lower()] = [precio, cantidad_disponible]
+  if nombre.lower() not in productos.keys():
+    productos[nombre.lower()] = [precio, cantidad_disponible]
+
+  elif nombre.lower() in productos.keys():
+    productos[nombre.lower()][1]+= cantidad_disponible
 
 def mostrar_inventario():
   for nombre in productos:
@@ -122,13 +122,28 @@ def opcion_n(opcion):
 
     # Rafa funcionalidad de Registrar salida
     case 4:
+
+      nombre = input("Ingrese el nombre del producto")
+
+      if nombre not in productos:
+        raise ValueError("Ingresa otro producto, este no")
+      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar"))
+
+      if cantidad_salida <= 0:
+        raise ValueError("No hay cantidad a retirar")
+
+      if cantidad_salida > productos[nombre][1]:
+        raise ValueError("No hay esa cantidad de producto")
+      productos[nombre]
+
+
+
       # Aqui implementa la funcionalidad de registrar salida
       # Es lo mismo que agregar producto, pero es tipo que lo quita
       # Tiene que existir, y revisa que se pueda quitar esa cantidad
       # de producto, si no se puede, entonces le devuelve un error al usuario
       # el error se devuelve con `raise ValueError()`, donde sea que lo pongas
       # el codigo try en el ciclo abajo, lo va a capturar, entonces ahi puedes poner un print con el mensaje para el usuario como se muestra en la linea 64
-      pass
 
 # ciclo principal
 while True:
@@ -146,4 +161,7 @@ while True:
     opcion_n(opcion)
   except ValueError:
     print('No se ha podido concretar tu opcion, intentalo de nuevo.')
+
+
+
 
