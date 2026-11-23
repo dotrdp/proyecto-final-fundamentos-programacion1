@@ -126,19 +126,19 @@ def opcion_n(opcion):
       nombre = input("Ingrese el nombre del producto: \n")
 
       if nombre not in productos:
-        print("Ingresa otro producto, este no")
+        print("Ingresa otro producto, este no existe.")
         return
 
-      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar: \n"))
+      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar.: \n"))
       if cantidad_salida <= 0:
-        print("No hay cantidad a retirar")
+        print("No hay cantidad a retirar.")
         return
 
       if cantidad_salida > productos[nombre][1]:
         print("No hay esa cantidad de producto")
         return
       productos[nombre][1] -= cantidad_salida
-      print("Salida registrada correctamente")
+      print("Salida registrada correctamente.")
 
 
       # Aqui implementa la funcionalidad de registrar salida
