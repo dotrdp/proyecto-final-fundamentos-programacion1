@@ -122,14 +122,16 @@ def opcion_n(opcion):
 
     # Rafa funcionalidad de Registrar salida
     case 4:
-      
-      nombre = input("Ingrese el nombre del producto")
+
+      nombre = input("Ingrese el nombre del producto: \n")
 
       if nombre not in productos:
         raise ValueError("Ingresa otro producto, este no")
-      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar"))
+
+      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar:b \n"))
       if cantidad_salida <= 0:
         raise ValueError("No hay cantidad a retirar")
+
       if cantidad_salida > productos[nombre][1]:
         raise ValueError("No hay esa cantidad de producto")
       productos[nombre]
