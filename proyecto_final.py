@@ -10,6 +10,7 @@ menu = """
 3. Buscar producto
 4. Registrar salida
 5. Guardar y salir
+6. registrar salida
 
 Seleccione una opción:
 """
@@ -59,6 +60,7 @@ def registrar_producto(nombre, precio, cantidad_disponible):
   elif nombre.lower() in productos.keys():
       productos[nombre.lower()][1]+= cantidad_disponible
       print(f"el producto {nombre}ya existe y se ah sumado{cantidad_disponible}")
+      return cantidad_disponible
 
   precio = float(precio)
 
@@ -68,6 +70,23 @@ def registrar_producto(nombre, precio, cantidad_disponible):
   elif cantidad_disponible < 0:
     print('la cantidad disponible no puede ser negativa')
     raise ValueError
+
+def registrar_salida(nombre, cantidad_salida):
+  nombre = nombre.lower()
+  cantidad_salida = int(cantidad_salida)
+
+  if nombre not in productos:
+    print(f"El producto {nombre} no existe")
+    return False
+  if cantidad_salida <= 0:
+    raise ValueError("La cantidad a retirar debe ser mayor que 0")
+  elif cantidad_salida > productos[nombre][1]:
+   print("No hay suficiente cantidad de producto")
+   raise ValueError 
+  
+  productos[nombre][1] -= cantidad_salida
+  print(f"Se retiraron {cantidad_salida} cantidad de {nombre}")
+  return cantidad_salida
 
   
 
@@ -139,6 +158,13 @@ def opcion_n(opcion):
       if cantidad_salida > productos[nombre][1]:
         raise ValueError("No hay esa cantidad de producto")
       productos[nombre]
+    
+    case 6:
+      nombre= input("ingresa el nombre del producto a retirar").lower()
+      cantidad_salida= int(input("ingresa la cantidad a quitar"))
+      registrar_salida(nombre,cantidad_salida)
+
+
 
 
 
@@ -150,21 +176,21 @@ def opcion_n(opcion):
       # el codigo try en el ciclo abajo, lo va a capturar, entonces ahi puedes poner un print con el mensaje para el usuario como se muestra en la linea 64
 
 # ciclo principal
-while True:
-  opcion = elegir_opcion()
+      while True:
+        opcion = elegir_opcion()
 
-  if opcion == 5:
-    if len(productos.keys()) != 0:
-      with open('inventario.txt', 'w') as archivo:
-        escritor = csv.writer(archivo)
-        for producto in productos:
-          precio, cantidad_disponible = productos[producto]
-          escritor.writerow([producto, precio, cantidad_disponible])
-    break
-  try:
-    opcion_n(opcion)
-  except ValueError:
-    print('No se ha podido concretar tu opcion, intentalo de nuevo.')
+        if opcion == 5:
+          if len(productos.keys()) != 0:
+            with open('inventario.txt', 'w') as archivo:
+              escritor = csv.writer(archivo)
+              for producto in productos:
+                precio, cantidad_disponible = productos[producto]
+                escritor.writerow([producto, precio, cantidad_disponible])
+          break
+        try:
+          opcion_n(opcion)
+        except ValueError:
+          print('No se ha podido concretar tu opcion, intentalo de nuevo.')
 
 
 
