@@ -126,22 +126,28 @@ def opcion_n(opcion):
       nombre = input("Ingrese el nombre del producto: \n")
 
       if nombre not in productos:
-        raise ValueError("Ingresa otro producto, este no")
+        print("Ingresa otro producto, este no")
+        return
 
-      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar:b \n"))
+      cantidad_salida = int(input("Ingresa la cantidad de productos a retirar: \n"))
       if cantidad_salida <= 0:
-        raise ValueError("No hay cantidad a retirar")
+        print("No hay cantidad a retirar")
+        return
 
       if cantidad_salida > productos[nombre][1]:
-        raise ValueError("No hay esa cantidad de producto")
-      productos[nombre]
+        print("No hay esa cantidad de producto")
+        return
+      productos[nombre][1] -= cantidad_salida
+      print("Salida registrada correctamente")
+
+
       # Aqui implementa la funcionalidad de registrar salida
       # Es lo mismo que agregar producto, pero es tipo que lo quita
       # Tiene que exitir, y revisa que se pueda quitar esa cantidad
       # de producto, si no se puede, entonces le devuelve un error al usuario
       # el error se devuelve con `raise ValueError()`, donde sea que lo pongas
       # el codigo try en el ciclo abajo, lo va a capturar, entonces ahi puedes poner un print con el mensaje para el usuario como se muestra en la linea 64
-      pass
+      
 
 # ciclo principal
 while True:
