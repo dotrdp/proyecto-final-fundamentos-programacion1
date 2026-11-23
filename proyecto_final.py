@@ -51,8 +51,16 @@ def buscar_producto(nombre):
     return False
 
 def registrar_producto(nombre, precio, cantidad_disponible):
-  precio = float(precio)
+ 
   cantidad_disponible = int(cantidad_disponible)
+  if nombre.lower() not in productos.keys():
+      productos[nombre.lower()] = [precio, cantidad_disponible]
+  
+  elif nombre.lower() in productos.keys():
+      productos[nombre.lower()][1]+= cantidad_disponible
+      print(f"el producto {nombre}ya existe y se ah sumado{cantidad_disponible}")
+
+  precio = float(precio)
 
   if precio <= 0:
     print('el precio no puede ser 0 o negativo')
@@ -61,11 +69,7 @@ def registrar_producto(nombre, precio, cantidad_disponible):
     print('la cantidad disponible no puede ser negativa')
     raise ValueError
 
-  if nombre.lower() not in productos.keys():
-    productos[nombre.lower()] = [precio, cantidad_disponible]
-
-  elif nombre.lower() in productos.keys():
-    productos[nombre.lower()][1]+= cantidad_disponible
+  
 
 def mostrar_inventario():
   for nombre in productos:
