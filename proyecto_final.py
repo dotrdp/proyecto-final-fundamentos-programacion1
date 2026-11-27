@@ -7,8 +7,8 @@ menu = """
 1. Registrar producto
 2. Registrar entrada
 3. Registrar salida
-4. Buscar producto
-5. Mostrar inventario
+4. Consultar producto
+5. Ver inventario
 6. Guardar y salir
 
 Seleccione una opción:
@@ -32,14 +32,31 @@ def elegir_opcion():
     return elegir_opcion()
 
 productos = {}
-def buscar_producto(nombre):
-  if nombre in productos.keys():
+def cargar_inventario():
+  try:
+    with open('inventario.csv', 'r', newline='') as archivo:
+      lector = csv.reader(archivo)
+      for fila in lector:
+        if len(fila) == 4:
+          codigo, nombre, precio, cantidad = fila
+          productos[codigo] = [nombre, float(precio), int(cantidad)]
+  except FileNotFoundError:
+    pass
+
+def buscar_producto(codigo):
+  if codigo in productos.keys():
     return True
   else:
     return False
 
-def registrar_producto(nombre, precio, cantidad_disponible):
-  if buscar_producto(nombre.lower()):
+def registrar_producto(codigo, nombre, precio, cantidad_disponible):
+  codigo = codigo.strip()
+  nombre = nombre.strip()
+
+  if codigo == '' or nombre == '':
+    print('el codigo y el nombre no pueden estar vacios')
+    raise ValueError
+  if buscar_producto(codigo):
     print("Dicho producto, ya existe")
     raise ValueError()
 
@@ -53,11 +70,11 @@ def registrar_producto(nombre, precio, cantidad_disponible):
     print('la cantidad disponible no puede ser negativa')
     raise ValueError
 
-  productos[nombre.lower()] = [precio, cantidad_disponible]
+  productos[codigo] = [nombre, precio, cantidad_disponible]
 
-def registrar_entrada(nombre, cantidad_entrada):
-  nombre = nombre.lower()
-  if not buscar_producto(nombre):
+def registrar_entrada(codigo, cantidad_entrada):
+  codigo = codigo.strip()
+  if not buscar_producto(codigo):
     print('Dicho producto no existe')
     raise ValueError
 
@@ -66,12 +83,12 @@ def registrar_entrada(nombre, cantidad_entrada):
     print('la cantidad debe ser mayor a 0')
     raise ValueError
 
-  productos[nombre][1] += cantidad_entrada
-  print(f'Nuevo total de {nombre}: {productos[nombre][1]}')
+  productos[codigo][2] += cantidad_entrada
+  print(f'Nuevo total de {productos[codigo][0]}: {productos[codigo][2]}')
 
-def registrar_salida(nombre, cantidad_salida):
-  nombre = nombre.lower()
-  if not buscar_producto(nombre):
+def registrar_salida(codigo, cantidad_salida):
+  codigo = codigo.strip()
+  if not buscar_producto(codigo):
     print('Dicho producto no existe')
     raise ValueError
 
@@ -79,20 +96,20 @@ def registrar_salida(nombre, cantidad_salida):
   if cantidad_salida <= 0:
     print('la cantidad debe ser mayor a 0')
     raise ValueError
-  elif cantidad_salida > productos[nombre][1]:
+  elif cantidad_salida > productos[codigo][2]:
     print('No hay suficiente cantidad de producto')
     raise ValueError
 
-  productos[nombre][1] -= cantidad_salida
-  print(f'Salida registrada correctamente. Nuevo total de {nombre}: {productos[nombre][1]}')
+  productos[codigo][2] -= cantidad_salida
+  print(f'Salida registrada correctamente. Nuevo total de {productos[codigo][0]}: {productos[codigo][2]}')
 
 def mostrar_inventario():
   if len(productos) == 0:
     print('El inventario esta vacio')
     return
-  for nombre in productos:
-    precio, cantidad = productos[nombre]
-    print(f'Nombre: {nombre}\nPrecio: {precio}\nCantidad disponible: {cantidad}\nValor total en inventarios: {precio * cantidad}')
+  for codigo in productos:
+    nombre, precio, cantidad = productos[codigo]
+    print(f'Codigo: {codigo}\nNombre: {nombre}\nPrecio: {precio}\nCantidad disponible: {cantidad}\nValor total en inventarios: {precio * cantidad}')
 
 def encontrar_producto_mayor():
   if len(productos) == 0:
@@ -101,15 +118,15 @@ def encontrar_producto_mayor():
   producto_mayor = list(productos)[0]
 
   for producto in productos:
-    if productos[producto][1] > productos[producto_mayor][1]:
+    if productos[producto][2] > productos[producto_mayor][2]:
       producto_mayor = producto
 
-  return producto_mayor
+  return productos[producto_mayor][0]
 
 def calcular_estadisticas():
   valor_total = 0
-  for nombre in productos:
-    precio, cantidad = productos[nombre]
+  for codigo in productos:
+    nombre, precio, cantidad = productos[codigo]
     valor_total += precio * cantidad
 
   producto_mayor = encontrar_producto_mayor()
@@ -125,34 +142,36 @@ Mayor existencia: {producto_mayor}
 def opcion_n(opcion):
   match opcion:
     case 1:
-      nombre, precio, cantidad_disponible = input("Cual sera el nombre del producto?\n"), input('Cual sera el precio del producto?\n'), input("Cual sera la cantidad disponible del producto?\n")
-      registrar_producto(nombre, precio, cantidad_disponible)
+      codigo, nombre, precio, cantidad_disponible = input("Cual sera el codigo del producto?\n"), input("Cual sera el nombre del producto?\n"), input('Cual sera el precio del producto?\n'), input("Cual sera la cantidad disponible del producto?\n")
+      registrar_producto(codigo, nombre, precio, cantidad_disponible)
     case 2:
-      nombre, cantidad_entrada = input('Cual es el nombre del producto?\n'), input('Cual es la cantidad recibida?\n')
-      registrar_entrada(nombre, cantidad_entrada)
+      codigo, cantidad_entrada = input('Cual es el codigo del producto?\n'), input('Cual es la cantidad recibida?\n')
+      registrar_entrada(codigo, cantidad_entrada)
     case 3:
-      nombre, cantidad_salida = input('Cual es el nombre del producto?\n'), input('Cual es la cantidad a retirar?\n')
-      registrar_salida(nombre, cantidad_salida)
+      codigo, cantidad_salida = input('Cual es el codigo del producto?\n'), input('Cual es la cantidad a retirar?\n')
+      registrar_salida(codigo, cantidad_salida)
     case 4:
-      nombre = input('Cual es el nombre del producto?\n').lower()
-      if buscar_producto(nombre):
-        precio, cantidad = productos[nombre]
-        print(f'Nombre: {nombre}\nPrecio: {precio}\nCantidad disponible: {cantidad}\nValor total en inventarios: {precio * cantidad}')
+      codigo = input('Cual es el codigo del producto?\n').strip()
+      if buscar_producto(codigo):
+        nombre, precio, cantidad = productos[codigo]
+        print(f'Codigo: {codigo}\nNombre: {nombre}\nPrecio: {precio}\nCantidad disponible: {cantidad}\nValor total en inventarios: {precio * cantidad}')
       else:
         print('Dicho producto no existe')
     case 5:
       mostrar_inventario()
+
+cargar_inventario()
 
 while True:
   opcion = elegir_opcion()
 
   if opcion == 6:
     if len(productos.keys()) != 0:
-      with open('inventario.txt', 'w') as archivo:
+      with open('inventario.csv', 'w', newline='') as archivo:
         escritor = csv.writer(archivo)
-        for producto in productos:
-          precio, cantidad_disponible = productos[producto]
-          escritor.writerow([producto, precio, cantidad_disponible])
+        for codigo in productos:
+          nombre, precio, cantidad_disponible = productos[codigo]
+          escritor.writerow([codigo, nombre, precio, cantidad_disponible])
     break
   try:
     opcion_n(opcion)
