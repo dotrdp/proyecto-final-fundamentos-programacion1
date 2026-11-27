@@ -69,6 +69,7 @@ def registrar_producto(id, nombre, precio, cantidad_disponible):
     raise ValueError
 
   productos[id] = [nombre, precio, cantidad_disponible]
+  assert productos[id] == [nombre, precio, cantidad_disponible], "El producto no se registro correctamente"
 
 def registrar_entrada(id, cantidad_entrada):
   id = id.lower()
@@ -81,8 +82,10 @@ def registrar_entrada(id, cantidad_entrada):
     print('la cantidad debe ser mayor a 0')
     raise ValueError
 
+  cantidad_anterior = productos[id][2]
   productos[id][2] += cantidad_entrada
   print(f'Nuevo total de {productos[id][0]}: {productos[id][2]}')
+  assert productos[id][2] == cantidad_anterior + cantidad_entrada, "La entrada no se sumo correctamente"
 
 def registrar_salida(id, cantidad_salida):
   id = id.lower()
@@ -98,16 +101,21 @@ def registrar_salida(id, cantidad_salida):
     print('No hay suficiente cantidad de producto')
     raise ValueError
 
+  cantidad_anterior = productos[id][2]
   productos[id][2] -= cantidad_salida
   print(f'Salida registrada correctamente. Nuevo total de {productos[id][0]}: {productos[id][2]}')
+  assert productos[id][2] == cantidad_anterior - cantidad_salida, "La salida no se resto correctamente"
 
 def mostrar_inventario():
   if len(productos) == 0:
     print('El inventario esta vacio')
     return
+  mostrados = 0
   for id in productos:
     nombre, precio, cantidad = productos[id]
     print(f'id: {id}\nNombre: {nombre}\nPrecio: {precio}\nCantidad disponible: {cantidad}\nValor total en inventarios: {precio * cantidad}')
+    mostrados += 1
+  assert mostrados == len(productos), "No se mostraron todos los productos del inventario"
 
 def encontrar_producto_mayor():
   if len(productos) == 0:
@@ -155,6 +163,7 @@ def opcion_n(opcion):
         print(f'id: {id}\nNombre: {nombre}\nPrecio: {precio}\nCantidad disponible: {cantidad}\nValor total en inventarios: {precio * cantidad}')
       else:
         print('Dicho producto no existe')
+      assert buscar_producto(id) == (id in productos), "La consulta del producto fallo"
     case 5:
       mostrar_inventario()
 
@@ -170,6 +179,8 @@ while True:
         for id in productos:
           nombre, precio, cantidad_disponible = productos[id]
           escritor.writerow([id, nombre, precio, cantidad_disponible])
+      with open('inventario.csv', 'r', newline='') as archivo:
+        assert len(list(csv.reader(archivo))) == len(productos), "No se guardaron todos los productos en el archivo"
     break
   try:
     opcion_n(opcion)
